@@ -1,0 +1,14 @@
+/*全局的样式*/
+html,body,#app{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.el-table{
+  margin-top: 0.5%;
+ /*
+ width: 94%;
+  margin-left: 3%;
+  margin-right:3%;*/
+}
