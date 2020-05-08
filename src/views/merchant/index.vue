@@ -43,6 +43,17 @@
           </el-table-column>
         </el-table>
       </div>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage4"
+          :page-sizes=pagesizes
+          :page-size="5"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total=total>
+        </el-pagination>
+      </div>
     </el-card>
   </div>
 </template>
@@ -56,6 +67,8 @@
     data() {
       return{
         merchants: [],
+        pagesizes:[2, 5, 10],
+        total: 0
       }
     },
     methods: {
@@ -63,6 +76,7 @@
         getMerchant().then((response) => {
           if (response.code == 200) {
             this.merchants = response.data
+            this.total = this.merchants.length
             console.log(this.merchants)
           }
         })
@@ -95,6 +109,11 @@
     height: 100%;
     /*margin-left: 3%;*/
     /*margin-right: 3%;*/
+    .block{
+      margin-top: 2%;
+      margin-bottom: 1%;
+      float: right;
+    }
   }
 
   .a{

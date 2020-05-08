@@ -30,7 +30,7 @@
 </template>
 
 <script>
-  import {login} from '../../api/admin'
+  import { login } from '../../api/admin'
 
   export default {
     name: 'Login',
@@ -67,7 +67,6 @@
             login(params).then((response) => {
               this.$message.success("登录成功");
               sessionStorage.setItem("token", response.data[0]);
-              sessionStorage.setItem("admin", JSON.stringify(response.data[1]));
               this.$router.push({path: "/home"})
             }).catch((response) => {
               console.log(response)

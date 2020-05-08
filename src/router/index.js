@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from '../views/login/index'
-import Home from '../views/home/index'
+import Login from '@/views/login/index'
+import Index from '@/views/index/index'
+import Home from '@/views/home/index'
 import Admin from '@/views/admin/index';
 import Merchant from '@/views/merchant/index'
+import Rights from '@/views/rights/index'
+import Roles from '@/views/roles/index'
 Vue.use(Router)
 
 const router = new Router({
@@ -22,9 +25,13 @@ const router = new Router({
       path: '/home',
       name: 'Home',
       component: Home,
+      redirect: '/index',
       children: [
-        {path: '/admin', name: 'Admin', component: Admin},
+        {path : '/index', name: 'Index', component: Index},
+        {path: '/adminList', name: 'Admin', component: Admin},
         {path: '/merchantList', name: 'Merchant', component: Merchant},
+        {path: '/rightsList', name: 'Rights', component: Rights},
+        {path: '/rolesList', name: 'Roles', component: Roles}
       ]
     },
   ]

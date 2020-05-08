@@ -29,10 +29,24 @@
             <i :class="item.iconPath"></i>
             <span>{{ item.content }}</span>
           </template>
-          <el-menu-item-group v-for="sub in item.children" :key="sub.menuId">
-<!--            <i :class="sub.iconPath"></i>-->
-            <el-menu-item @click="select(editableTabsValue, sub.content)" :index="'/' + sub.path">{{ sub.content }}</el-menu-item>
-          </el-menu-item-group>
+
+          <el-menu-item @click="select(editableTabsValue, sub.content, sub.path)" :index="'/'+sub.path"
+                        v-for="sub in item.children" :key="sub.mid">
+            <!-- 2级菜单的模板区 -->
+            <template slot="title">
+              <!-- 2级菜单的图标 -->
+              <i :class="sub.iconPath"></i>
+              <!-- 2级菜单的文本 -->
+              <span>{{ sub.content }}</span>
+            </template>
+          </el-menu-item>
+
+          <!--          <el-menu-item-group v-for="sub in item.children" :key="sub.menuId">-->
+          <!--&lt;!&ndash;            <i :class="sub.iconPath"></i>&ndash;&gt;-->
+          <!--            <el-menu-item @click="select(editableTabsValue, sub.content)" :index="'/' + sub.path">{{ sub.content }}</el-menu-item>-->
+          <!--          </el-menu-item-group>-->
+
+
         </el-submenu>
       </el-menu>
     </el-aside>
@@ -40,29 +54,31 @@
     <el-container>
       <el-header>
         <div>
+          <span>当前管理员：{{ admin.name }}</span>
         </div>
         <div>
           <el-dropdown trigger="click">
             <el-avatar shape="square" :src="this.admin.avatar"></el-avatar>
             <el-dropdown-menu placement="bottom-start" slot="dropdown">
-              <a class="a" href="#"><el-dropdown-item>首页</el-dropdown-item></a>
-              <a class="a" href="#" @click="logout"><el-dropdown-item>退出</el-dropdown-item></a>
+              <a class="a" href="#">
+                <el-dropdown-item>首页</el-dropdown-item>
+              </a>
+              <a class="a" href="#" @click="logout">
+                <el-dropdown-item>退出</el-dropdown-item>
+              </a>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
       </el-header>
       <div style="background-color: #F4F4F5; height: 10px"></div>
-      <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
-        <el-tab-pane
-          v-for="(item, index) in editableTabs"
-          :key="item.name"
-          :label="item.title"
-          :name="item.name"
-        >
-          <router-view>
-          </router-view>
+      <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab" @tab-click="clickTab()">
+        <el-tab-pane v-for="(item, index) in editableTabs" :key="item.name" :label="item.title" :name="item.name">
         </el-tab-pane>
       </el-tabs>
+      <el-main>
+        <router-view>
+        </router-view>
+      </el-main>
     </el-container>
   </el-container>
 
@@ -73,32 +89,31 @@
 
   export default {
     name: "home",
-    components: {
-    },
+    components: {},
     data() {
       return {
         menus: {},
         admin: {},
         editableTabsValue: '',
-        editableTabs: [
-
-        ],
-        tabIndex: 0,
-        isCollapse: false
+        editableTabs: [],
+        tabsPath: '',
+        isCollapse: false,
+        flag: true
       }
     },
     methods: {
-      logout: function() {
+      logout() {
         sessionStorage.clear()
         this.$router.push({path: '/'})
       },
-      select: function (editableTabsValue, title) {
+      async select(editableTabsValue, title, name) {
         for (let i = 0; i < this.editableTabs.length; i++) {
           if (this.editableTabs[i].title == title) {
+            this.flag = false
             this.removeTab(this.editableTabs[i].name)
           }
         }
-        let newTabName = ++this.tabIndex + '';
+        let newTabName = name;
         this.editableTabs.push({
           title: title,
           name: newTabName,
@@ -120,13 +135,25 @@
         }
         this.editableTabsValue = activeName;
         this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+        if (this.flag) {
+          try {
+            this.$router.push({path: '/' + this.editableTabs[this.editableTabs.length - 1].name})
+          } catch (e) {
+            this.$router.push({path: '/index'})
+          }
+        }
+      },
+      clickTab(targetTab) {
+        console.log(this.editableTabs)
+        console.log(targetTab)
       },
       async getMenu() {
-        getMenu(this.admin.rid).then((response) => {
+        getMenu().then((response) => {
           if (response.code != 200) {
             this.$message.error(response.message)
           } else {
-            this.menus = response.data
+            this.menus = response.data.menu
+            this.admin = response.data.admin
           }
         })
       },
@@ -135,8 +162,6 @@
       },
     },
     created() {
-      let admin = JSON.parse(sessionStorage.getItem('admin'))
-      this.admin = admin
       this.getMenu()
     },
   }
@@ -166,10 +191,12 @@
     color: white;
     line-height: 60px;
     justify-content: space-between;
+
     .el-menu {
       border-right: none;
     }
-    .a{
+
+    .a {
       text-decoration: none;
       color: #F4F4F5;
     }
@@ -179,7 +206,6 @@
     background-color: white;
     color: #333;
     text-align: center;
-    line-height: 160px;
   }
 
   .el-avatar {
@@ -188,7 +214,8 @@
     line-height: 400%;
     border: none;
   }
-  .a{
+
+  .a {
     text-decoration: none;
   }
 </style>
